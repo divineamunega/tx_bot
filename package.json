@@ -1,0 +1,23 @@
+{
+	"name": "tx_bot",
+	"version": "1.0.0",
+	"description": "A an AI twitter and telegram bot",
+	"main": "src/main.ts",
+	"scripts": {
+		"build": "tsc",
+		"test": "test",
+		"start": "node dist/main.js",
+		"dev": "nodemon src/main.ts"
+	},
+	"devDependencies": {
+		"@types/node": "^22.9.0",
+		"nodemon": "^3.1.7",
+		"typescript": "^5.6.3"
+	},
+	"author": "Divine Amunega",
+	"license": "ISC",
+	"dependencies": {
+		"dotenv": "^16.4.5",
+		"telegraf": "^4.16.3"
+	}
+}
