@@ -2,12 +2,12 @@
 	"name": "tx_bot",
 	"version": "1.0.0",
 	"description": "A an AI twitter and telegram bot",
-	"main": "src/main.ts",
 	"scripts": {
 		"build": "tsc",
-		"test": "test",
-		"start": "node dist/main.js",
-		"dev": "nodemon src/main.ts"
+		"start:bot": "node dist/bot/index.js",
+		"start:x_service": "node dist/bot/server.js",
+		"dev:bot": "nodemon src/bot/index.ts",
+		"dev:x_service": "nodemon src/x_service/server.ts"
 	},
 	"devDependencies": {
 		"@types/node": "^22.9.0",
