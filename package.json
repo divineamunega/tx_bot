@@ -5,16 +5,9 @@
 	"scripts": {
 		"build": "tsc",
 		"start:bot": "node dist/bot/index.js",
-		"start:x_service": "node dist/bot/server.js",
-		"dev:bot": "nodemon src/bot/index.ts",
-		"dev:x_service": "nodemon src/x_service/server.ts"
+		"dev:bot": "nodemon src/bot/index.ts"
 	},
 	"devDependencies": {
-		"@types/express": "^5.0.0",
-		"@types/express-session": "^1.18.0",
-		"@types/node": "^22.9.0",
-		"@types/passport": "^1.0.17",
-		"@types/passport-twitter": "^1.0.40",
 		"nodemon": "^3.1.7",
 		"typescript": "^5.6.3"
 	},
@@ -22,11 +15,6 @@
 	"license": "ISC",
 	"dependencies": {
 		"dotenv": "^16.4.5",
-		"express": "^4.21.1",
-		"express-session": "^1.18.1",
-		"mongoose": "^8.8.3",
-		"passport": "^0.7.0",
-		"passport-twitter": "^0.1.5",
 		"telegraf": "^4.16.3"
 	}
 }
