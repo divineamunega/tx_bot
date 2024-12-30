@@ -1,5 +1,6 @@
 import { configDotenv } from "dotenv";
 // a comment
+// another comment
 
 configDotenv({ path: ".env" });
 const BASE_URL = "https://api.telegram.org/bot";
