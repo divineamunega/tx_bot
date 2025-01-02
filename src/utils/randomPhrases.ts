@@ -14,7 +14,7 @@ const phrases = [
 ];
 
 const randomPhrase = function () {
-	return phrases[Math.random() * phrases.length];
+	return phrases[Math.floor(Math.random() * phrases.length)];
 };
 
 export default randomPhrase;

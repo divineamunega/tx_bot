@@ -4,6 +4,7 @@ import randomTimes from "./utils/randomTimes";
 import { startRedis, searchRedis } from "./redis";
 import formatTimeFromMinute from "./utils/formatTimeFromMinute";
 import getQuote from "./getRandomQuote";
+import randomPhrase from "./utils/randomPhrases";
 
 configDotenv({ path: ".env" });
 
@@ -12,10 +13,10 @@ console.log(times);
 
 times;
 (async () => {
-	const currentMinute = new Date().getHours() * 60 + new Date().getMinutes();
 	const client = await startRedis();
 
 	while (true) {
+		const currentMinute = new Date().getHours() * 60 + new Date().getMinutes();
 		const updates = await getUpdates();
 		const allUsers = await searchRedis(client, "*:init", "true");
 
@@ -43,11 +44,11 @@ times;
 			const nextMessageTime = times.find((time) => time > currentMinute);
 
 			await sendMessage(
-				`Holla ${name}. Lock in \n \n The people who change the world are those crazy enough to think that they can. -Steve Jobs`,
+				`Holla ${name}. \n\n ${randomPhrase()} \n\n The people who change the world are those crazy enough to think that they can. <b>-Steve Jobs</b>`,
 				id
 			);
 
-			await new Promise((resolve) => setTimeout(resolve, 4000));
+			await new Promise((resolve) => setTimeout(resolve, 5000));
 			sendMessage(
 				`I will remind you to lock in again by ${formatTimeFromMinute(
 					nextMessageTime!
@@ -65,10 +66,13 @@ times;
 			if (currentMinute === times[i]) {
 				// Perfect place to generate quote
 				const { q, a } = await getQuote();
-				const message = `${q} \n \m <b>${a}</b>`;
+				const message = `${randomPhrase()}\n\n${q} \n\n <b>${a}</b>`;
 
 				for (let j = 0; j < allUsers.length; j++) {
-					await sendMessage(message, allUsers[i].key.split(":")[0]);
+					console.log(allUsers, "ALLUSERS");
+
+					await sendMessage(message, allUsers[j].key.split(":")[0]);
+					await new Promise((resolve) => setTimeout(resolve, 5000));
 				}
 			}
 		}
