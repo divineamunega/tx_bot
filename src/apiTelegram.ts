@@ -10,15 +10,21 @@ const BOTURL = BASE_URL + tgBotToken;
 type Message = { text: string; from: any; chat: any };
 
 type Updates = {
-	updateId: string;
+	update_id: string;
 	message: Message;
 	date: number;
 	text?: string;
 };
 
-const getUpdates = async function () {
+const getUpdates = async function (offset?: number) {
 	try {
-		const res = await fetch(`${BOTURL}/getUpdates`);
+		const res = await fetch(`${BOTURL}/getUpdates`, {
+			headers: {
+				"Content-Type": "application/json",
+			},
+			method: "POST",
+			body: JSON.stringify({ offset }),
+		});
 		if (!res.ok)
 			throw new Error("An error occured while getting telegram updates.");
 
