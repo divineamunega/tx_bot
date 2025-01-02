@@ -38,14 +38,22 @@ const getUpdates = async function (offset?: number) {
 	} catch (err) {}
 };
 
-const sendMessage = async function (message: string, chatId: number) {
+const sendMessage = async function (
+	message: string,
+	chatId: number,
+	parseMode = "HTML"
+) {
 	try {
 		const res = await fetch(`${BOTURL}/sendMessage`, {
 			headers: {
 				"Content-Type": "application/json",
 			},
 			method: "POST",
-			body: JSON.stringify({ text: message, chat_id: String(chatId) }),
+			body: JSON.stringify({
+				text: message,
+				chat_id: String(chatId),
+				parse_mode: parseMode,
+			}),
 		});
 
 		// if (!res.ok) throw new Error("An error occured while sending the message");
@@ -56,7 +64,9 @@ const sendMessage = async function (message: string, chatId: number) {
 
 		return data;
 	} catch (err) {
+		console.log("SENDING MESSAGE ERROR");
 		console.log(err);
+		throw err;
 	}
 };
 
