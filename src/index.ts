@@ -9,11 +9,12 @@ import randomPhrase from "./utils/randomPhrases";
 configDotenv({ path: ".env" });
 
 const times = randomTimes(12).sort((a, b) => a - b);
-console.log(times);
 
-times;
+const sentForMinute: any = {};
+
 (async () => {
 	const client = await startRedis();
+	const todayKey = `${new Date().getFullYear()}:${new Date().getMonth()}:${new Date().getDate()}`;
 
 	while (true) {
 		const currentMinute = new Date().getHours() * 60 + new Date().getMinutes();
@@ -63,7 +64,10 @@ times;
 		for (let i = 0; i < times.length; i++) {
 			if (currentMinute > times[i]) continue;
 
-			if (currentMinute === times[i]) {
+			if (
+				currentMinute === times[i] &&
+				sentForMinute[`${todayKey}:${currentMinute}`]
+			) {
 				// Perfect place to generate quote
 				const { q, a } = await getQuote();
 				const message = `${randomPhrase()}\n\n${q} \n\n <b>${a}</b>`;
@@ -74,19 +78,10 @@ times;
 					await sendMessage(message, allUsers[j].key.split(":")[0]);
 					await new Promise((resolve) => setTimeout(resolve, 5000));
 				}
+
+				sentForMinute[`${todayKey}:${currentMinute}`] = true;
 			}
 		}
-
-		// startMessages?.forEach(({ message }) => {
-		// 	const firstName = message.from.first_name;
-		// 	let botReply = `Holla ${firstName} Lock tf In!!!`;
-		// 	const chatId = message.chat.id;
-		// 	botReply;
-		// 	chatId;
-		// 	sendMessage;
-
-		// 	// sendMessage(botReply, chatId);
-		// });
 
 		await new Promise((resolve) => setTimeout(resolve, 2000));
 	}
