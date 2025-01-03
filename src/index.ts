@@ -1,54 +1,38 @@
 import { configDotenv } from "dotenv";
-import { getUpdates, sendMessage } from "./apiTelegram";
+import { getUpdates } from "./apiTelegram";
 import randomTimes from "./utils/randomTimes";
 import { startRedis, searchRedis } from "./redis";
-import formatTimeFromMinute from "./utils/formatTimeFromMinute";
-import getQuote from "./getRandomQuote";
-import randomPhrase from "./utils/randomPhrases";
-import currentMinute from "./utils/getCurrentMinute";
 import getCurrentMinute from "./utils/getCurrentMinute";
 import greetWelcome from "./actions/greetWelcome";
+import lockInReminder from "./actions/lockinReminder";
+import delay from "./utils/delay";
 
 configDotenv({ path: ".env" });
 
 const times = randomTimes(12).sort((a, b) => a - b);
-const sentForMinute: any = {};
 
 (async () => {
-	const client = await startRedis();
-	const todayKey = `${new Date().getFullYear()}:${new Date().getMonth()}:${new Date().getDate()}`;
+	try {
+		const client = await startRedis();
+		const todayKey = `${new Date().getFullYear()}:${new Date().getMonth()}:${new Date().getDate()}`;
 
-	while (true) {
-		const currentMinute = getCurrentMinute();
-		const updates = await getUpdates();
-		const allUsers = await searchRedis(client, "*:init", "true");
+		while (true) {
+			const currentMinute = getCurrentMinute();
+			const updates = await getUpdates(); // Get Updates from Telegram
+			const allUsers = await searchRedis(client, "*:init", "true");
 
-		// Greet all new users a custom welcome message
-		updates?.length &&
-			(await greetWelcome(updates, client, times, currentMinute));
+			// Greet all new users a custom welcome message
+			updates?.length &&
+				(await greetWelcome(updates, client, times, currentMinute));
 
-		for (let i = 0; i < times.length; i++) {
-			if (currentMinute > times[i]) continue;
+			// Remind users to lock in at the random times
+			await lockInReminder(currentMinute, times, todayKey, allUsers);
 
-			if (
-				currentMinute === times[i] &&
-				sentForMinute[`${todayKey}:${currentMinute}`]
-			) {
-				// Perfect place to generate quote
-				const { q, a } = await getQuote();
-				const message = `${randomPhrase()}\n\n${q} \n\n <b>${a}</b>`;
-
-				for (let j = 0; j < allUsers.length; j++) {
-					console.log(allUsers, "ALLUSERS");
-
-					await sendMessage(message, allUsers[j].key.split(":")[0]);
-					await new Promise((resolve) => setTimeout(resolve, 5000));
-				}
-
-				sentForMinute[`${todayKey}:${currentMinute}`] = true;
-			}
+			await delay(3);
 		}
-
-		await new Promise((resolve) => setTimeout(resolve, 2000));
+	} catch (err: any) {
+		console.log("AN ERROR OCCURED");
+		console.log(err.message);
+		process.kill(process.pid, "SIGTERM");
 	}
 })();
