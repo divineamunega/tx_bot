@@ -1,4 +1,3 @@
-import { RedisClientType } from "redis";
 import { searchRedis } from "../redis";
 import { sendMessage } from "../apiTelegram";
 import randomPhrase from "../utils/randomPhrases";
@@ -15,7 +14,7 @@ type Updates = {
 
 const greetWelcome = async function (
 	telegramUpdates: Updates[],
-	redisClient: RedisClientType,
+	redisClient: any,
 	times: number[],
 	currentMinute: number
 ) {

@@ -7,6 +7,7 @@ import getQuote from "./getRandomQuote";
 import randomPhrase from "./utils/randomPhrases";
 import currentMinute from "./utils/getCurrentMinute";
 import getCurrentMinute from "./utils/getCurrentMinute";
+import greetWelcome from "./actions/greetWelcome";
 
 configDotenv({ path: ".env" });
 
@@ -22,44 +23,9 @@ const sentForMinute: any = {};
 		const updates = await getUpdates();
 		const allUsers = await searchRedis(client, "*:init", "true");
 
-		const startUpdates =
-			updates?.filter((update) => update.message.text === "/start") || [];
-
-		const filteredStartUpdates = [];
-		for (const update of startUpdates) {
-			const userId = update.message.from.id;
-			let userName = update.message.from.username + "";
-
-			if ((await client.get(userId + ":init")) !== "true") {
-				await client.set(userId + ":init", "true");
-				await client.set(userId + `:${userName}` + ":start", "false");
-				filteredStartUpdates.push(update);
-			}
-		}
-
-		const greetWelcome = await searchRedis(client, "*:start", "false");
-
-		for (let i = 0; i < greetWelcome.length; i++) {
-			if (greetWelcome[i].value === "true") continue;
-			const [id, name] = greetWelcome[i].key.split(":");
-			const nextMessageTime = times.find((time) => time > currentMinute);
-
-			await sendMessage(
-				`Holla ${name}. \n\n ${randomPhrase()} \n\n The people who change the world are those crazy enough to think that they can. <b>-Steve Jobs</b>`,
-				id
-			);
-
-			await new Promise((resolve) => setTimeout(resolve, 5000));
-			sendMessage(
-				`I will remind you to lock in again by ${formatTimeFromMinute(
-					nextMessageTime!
-				)} \n <b>So you dont slack off again 💀 🫵</b>`,
-				id,
-				"HTML"
-			);
-
-			await client.set(id + `:${name}` + ":start", "true");
-		}
+		// Greet all new users a custom welcome message
+		updates?.length &&
+			(await greetWelcome(updates, client, times, currentMinute));
 
 		for (let i = 0; i < times.length; i++) {
 			if (currentMinute > times[i]) continue;
