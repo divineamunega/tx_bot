@@ -38,7 +38,8 @@ const greetWelcome = async function (
 	for (let i = 0; i < greetWelcome.length; i++) {
 		if (greetWelcome[i].value === "true") continue;
 		const [id, name] = greetWelcome[i].key.split(":");
-		const nextMessageTime = times.find((time) => time > currentMinute);
+		const nextMessageTime =
+			times.find((time) => time > +currentMinute) || Math.min(...times);
 
 		await sendMessage(
 			`Holla ${name}. \n\n ${randomPhrase()} \n\n The people who change the world are those crazy enough to think that they can. <b>-Steve Jobs</b>`,
@@ -46,7 +47,7 @@ const greetWelcome = async function (
 		);
 
 		await new Promise((resolve) => setTimeout(resolve, 5000));
-		sendMessage(
+		await sendMessage(
 			`I will remind you to lock in again by ${formatTimeFromMinute(
 				nextMessageTime!
 			)} \n <b>So you dont slack off again 💀 🫵</b>`,
