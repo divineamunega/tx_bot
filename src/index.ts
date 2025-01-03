@@ -5,11 +5,12 @@ import { startRedis, searchRedis } from "./redis";
 import formatTimeFromMinute from "./utils/formatTimeFromMinute";
 import getQuote from "./getRandomQuote";
 import randomPhrase from "./utils/randomPhrases";
+import currentMinute from "./utils/getCurrentMinute";
+import getCurrentMinute from "./utils/getCurrentMinute";
 
 configDotenv({ path: ".env" });
 
 const times = randomTimes(12).sort((a, b) => a - b);
-
 const sentForMinute: any = {};
 
 (async () => {
@@ -17,7 +18,7 @@ const sentForMinute: any = {};
 	const todayKey = `${new Date().getFullYear()}:${new Date().getMonth()}:${new Date().getDate()}`;
 
 	while (true) {
-		const currentMinute = new Date().getHours() * 60 + new Date().getMinutes();
+		const currentMinute = getCurrentMinute();
 		const updates = await getUpdates();
 		const allUsers = await searchRedis(client, "*:init", "true");
 
@@ -36,7 +37,6 @@ const sentForMinute: any = {};
 			}
 		}
 
-		console.log(startUpdates, "Length");
 		const greetWelcome = await searchRedis(client, "*:start", "false");
 
 		for (let i = 0; i < greetWelcome.length; i++) {
