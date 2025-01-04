@@ -23,7 +23,7 @@ const greetWelcome = async function (
 	const filteredStartUpdates = [];
 	for (const update of startUpdates) {
 		const userId = update.message.from.id;
-		let userName = update.message.from.username + "";
+		let userName = update.message.from.username || "anon";
 
 		if ((await redisClient.get(userId + ":init")) !== "true") {
 			await redisClient.set(userId + ":init", "true");
