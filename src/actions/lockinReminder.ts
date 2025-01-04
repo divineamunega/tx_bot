@@ -14,7 +14,7 @@ const lockInReminder = async function (
 
 		if (
 			currentMinute === times[i] &&
-			sentForMinute[`${todayKey}:${currentMinute}`]
+			!sentForMinute[`${todayKey}:${currentMinute}`]
 		) {
 			const { q, a } = await getQuote();
 			const message = `${randomPhrase()}\n\n${q} \n\n <b>${a}</b>`;
