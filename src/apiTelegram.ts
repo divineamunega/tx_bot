@@ -68,7 +68,7 @@ const sendMessage = async function (
 				},
 				method: "POST",
 				body: JSON.stringify({
-					// text: message,
+					text: message,
 					chat_id: String(chatId),
 					parse_mode: parseMode,
 				}),

@@ -20,13 +20,20 @@ const times = randomTimes(12).sort((a, b) => a - b);
 			const currentMinute = getCurrentMinute();
 			const updates = await getUpdates(); // Get Updates from Telegram
 			const allUsers = await searchRedis(client, "*:init", "true");
+			const nextMessageTime =
+				times.find((time) => time > +currentMinute) || Math.min(...times);
 
 			// Greet all new users a custom welcome message
-			updates?.length &&
-				(await greetWelcome(updates, client, times, currentMinute));
+			updates?.length && (await greetWelcome(updates, client, nextMessageTime));
 
 			// Remind users to lock in at the random times
-			await lockInReminder(currentMinute, times, todayKey, allUsers);
+			await lockInReminder(
+				currentMinute,
+				times,
+				todayKey,
+				allUsers,
+				nextMessageTime
+			);
 
 			await delay(3);
 		}

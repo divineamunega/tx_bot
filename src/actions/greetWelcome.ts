@@ -15,8 +15,7 @@ type Updates = {
 const greetWelcome = async function (
 	telegramUpdates: Updates[],
 	redisClient: any,
-	times: number[],
-	currentMinute: number
+	nextMessageTime: number
 ) {
 	const startUpdates =
 		telegramUpdates?.filter((update) => update.message.text === "/start") || [];
@@ -38,8 +37,6 @@ const greetWelcome = async function (
 	for (let i = 0; i < greetWelcome.length; i++) {
 		if (greetWelcome[i].value === "true") continue;
 		const [id, name] = greetWelcome[i].key.split(":");
-		const nextMessageTime =
-			times.find((time) => time > +currentMinute) || Math.min(...times);
 
 		await sendMessage(
 			`Holla ${name}. \n\n ${randomPhrase()} \n\n The people who change the world are those crazy enough to think that they can. <b>-Steve Jobs</b>`,

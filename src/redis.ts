@@ -33,7 +33,6 @@ const searchRedis = async (client: any, match: string, filterValue: string) => {
 		}
 	} while (cursor !== 0);
 
-	console.log("Matching Keys with Values:", matchingKeys);
 	return matchingKeys;
 };
 
