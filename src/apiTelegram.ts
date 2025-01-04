@@ -1,6 +1,5 @@
 import { configDotenv } from "dotenv";
-// a comment
-// another comment
+import delay from "./utils/delay";
 
 configDotenv({ path: ".env" });
 const BASE_URL = "https://api.telegram.org/bot";
@@ -16,57 +15,82 @@ type Updates = {
 	text?: string;
 };
 
-const getUpdates = async function (offset?: number) {
-	try {
-		const res = await fetch(`${BOTURL}/getUpdates`, {
-			headers: {
-				"Content-Type": "application/json",
-			},
-			method: "POST",
-			body: JSON.stringify({ offset }),
-		});
-		if (!res.ok)
-			throw new Error("An error occured while getting telegram updates.");
+const getUpdates = async function (offset?: number, retry = 3) {
+	let numRetry = 0;
+	while (numRetry < retry) {
+		numRetry++;
+		try {
+			const res = await fetch(`${BOTURL}/getUpdates`, {
+				headers: {
+					"Content-Type": "application/json",
+				},
+				method: "POST",
+				body: JSON.stringify({ offset }),
+			});
+			if (!res.ok)
+				throw new Error("An error occured while getting telegram updates.");
 
-		const data = await res.json();
+			const data = await res.json();
 
-		if (!data.ok)
-			throw new Error("An error occured while getting telegram updates");
+			if (!data.ok)
+				throw new Error("An error occured while getting telegram updates");
 
-		const updates: Updates[] = data.result;
-		return updates;
-	} catch (err) {}
+			const updates: Updates[] = data.result;
+			return updates;
+		} catch (err: any) {
+			if (numRetry <= retry) {
+				await delay(3);
+				console.log(`${err.message} Retried: ${numRetry}/${retry}`);
+			}
+
+			if (numRetry === retry) {
+				console.log("COULD NOT FETCH TELEGRAM UPDATES!");
+				throw new Error(err);
+			}
+		}
+	}
 };
 
 const sendMessage = async function (
 	message: string,
 	chatId: number,
-	parseMode = "HTML"
+	parseMode = "HTML",
+	retry = 3
 ) {
-	try {
-		const res = await fetch(`${BOTURL}/sendMessage`, {
-			headers: {
-				"Content-Type": "application/json",
-			},
-			method: "POST",
-			body: JSON.stringify({
-				text: message,
-				chat_id: String(chatId),
-				parse_mode: parseMode,
-			}),
-		});
+	let numRetry = 0;
 
-		// if (!res.ok) throw new Error("An error occured while sending the message");
+	while (numRetry < retry) {
+		numRetry++;
+		try {
+			const res = await fetch(`${BOTURL}/sendMessage`, {
+				headers: {
+					"Content-Type": "application/json",
+				},
+				method: "POST",
+				body: JSON.stringify({
+					// text: message,
+					chat_id: String(chatId),
+					parse_mode: parseMode,
+				}),
+			});
 
-		const data = await res.json();
+			const data = await res.json();
+			if (!data.ok) throw new Error(data);
 
-		console.log(data);
+			return data;
+		} catch (err: any) {
+			if (numRetry <= retry) {
+				console.log(
+					`SENDING OF TELEGRAM MESSAGES FAILED! ${numRetry}/${retry}`
+				);
+				await delay(3);
+			}
 
-		return data;
-	} catch (err) {
-		console.log("SENDING MESSAGE ERROR");
-		console.log(err);
-		throw err;
+			if (numRetry === retry) {
+				console.log("COULD NOT SEND TELEGRAM MESSSAGES");
+				throw new Error(err);
+			}
+		}
 	}
 };
 
