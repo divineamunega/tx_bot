@@ -38,8 +38,8 @@ const times = randomTimes(12).sort((a, b) => a - b);
 			await delay(3);
 		}
 	} catch (err: any) {
-		console.log("AN ERROR OCCURED");
 		console.log(err.message);
+		console.log("EXITING APP!!");
 		process.kill(process.pid, "SIGTERM");
 	}
 })();
