@@ -15,7 +15,7 @@ type Updates = {
 	text?: string;
 };
 
-const getUpdates = async function (offset?: number, retry = 3) {
+const getUpdates = async function (offset?: number, retry = 4, delayTime = 4) {
 	let numRetry = 0;
 	while (numRetry < retry) {
 		numRetry++;
@@ -39,7 +39,7 @@ const getUpdates = async function (offset?: number, retry = 3) {
 			return updates;
 		} catch (err: any) {
 			if (numRetry <= retry) {
-				await delay(3);
+				await delay(delayTime);
 				console.log(`${err.message} Retried: ${numRetry}/${retry}`);
 			}
 

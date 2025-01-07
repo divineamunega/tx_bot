@@ -31,6 +31,7 @@ const greetWelcome = async function (
 			filteredStartUpdates.push(update);
 		}
 	}
+	console.log("FILTERED", filteredStartUpdates);
 
 	const greetWelcome = await searchRedis(redisClient, "*:start", "false");
 
